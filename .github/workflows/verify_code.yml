@@ -19,13 +19,17 @@ jobs:
           python-version: '3.10'
           
       - name: Install dependencies
+        working-directory: ./backend
         run: pip install -r requirements.txt
         
-      - name: Lint with Flake8
+      - name: Lint
+        working-directory: ./backend
         run: flake8 easybudget tests
         
-      - name: Run unit tests
+      - name: Unit tests
+        working-directory: ./backend
         run: pytest
         
-      - name: Verify type annotations
+      - name: Typechecking
+        working-directory: ./backend
         run: mypy --ignore-missing-imports easybudget
