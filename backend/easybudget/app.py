@@ -24,6 +24,10 @@ def create_app():
     def login():
         return routes.login(db_service, request, jwt_secret)
 
+    @app.route('/budgets', methods=['GET'])
+    def get_budgets():
+        return routes.get_budgets(db_service, request, jwt_secret)
+
     return app
 
 

@@ -2,6 +2,7 @@ import easybudget.jwt_provider as jwt_provider
 from easybudget.db.db import DbService
 from http import HTTPStatus
 import easybudget.hashing as hashing
+from jwt.exceptions import InvalidSignatureError, DecodeError
 
 
 def register(db_service: DbService, request) -> tuple[dict, int]:
@@ -33,3 +34,14 @@ def get_users(db_service: DbService) -> dict[str, list]:
     users = list(db_service.users)
 
     return {'users': [{'username': u.username, 'password': u.password_sha2} for u in users]}
+
+
+def get_budgets(db_service: DbService, request, jwt_secret: str):
+    try:
+        token = request.headers.get('Authorization').split()[1]
+        payload = jwt_provider.decode(token, jwt_secret)
+        return payload['username'], 200
+    except InvalidSignatureError:
+        return {'status': 'INVALID TOKEN SIGNATURE'}, 400
+    except DecodeError:
+        return {'status': 'INVALID TOKEN'}, 400
