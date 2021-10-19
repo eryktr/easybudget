@@ -6,6 +6,7 @@ import routes
 
 def create_app():
     app = Flask(__name__)
+    jwt_secret = 'shouldBeRandomAndKeptSecretInProduction'
     app.config.from_mapping(
         SECRET_KEY='dev',
     )

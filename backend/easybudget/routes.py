@@ -22,7 +22,8 @@ def login(db_service: DbService, request):
     password_sha = hashing.sha512(password)
 
     if db_service.credentials_ok(username, password_sha):
-        return {'status': 'OK'}, HTTPStatus.OK
+        import os
+        return {'status': 'OK', }, HTTPStatus.OK
 
     return {'status': 'BAD'}, HTTPStatus.BAD_REQUEST
 
