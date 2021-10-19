@@ -13,11 +13,17 @@ class DbService:
         uri = _build_uri(user, password, host, db)
         connect(uri)
 
-    def add_user(self, username: str, pass_sha2: str) -> None:
-        User(username, pass_sha2).save()
+    def add_user(self, username: str, pass_sha: str) -> None:
+        User(username, pass_sha).save()
 
     def user_exists(self, username: str) -> bool:
         return User.objects.raw({'username': username}).count() > 0
+
+    def credentials_ok(self, username: str, pass_sha: str) -> bool:
+        return User.objects.raw({
+            'username': username,
+            'password_sha2': pass_sha,
+        }).count() > 0
 
     @property
     def users(self) -> Iterator[User]:

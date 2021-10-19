@@ -19,6 +19,10 @@ def create_app():
     def get_users():
         return routes.get_users(db_service)
 
+    @app.route('/login', methods=['POST'])
+    def login():
+        return routes.login(db_service, request)
+
     return app
 
 
