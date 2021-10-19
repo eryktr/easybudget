@@ -22,7 +22,7 @@ def create_app():
 
     @app.route('/login', methods=['POST'])
     def login():
-        return routes.login(db_service, request)
+        return routes.login(db_service, request, jwt_secret)
 
     return app
 

@@ -19,7 +19,7 @@ def test_register_fails_when_user_exists(dummy_db, mocker):
 
     _, status = register(dummy_db, request)
 
-    assert status == HTTPStatus.BAD_REQUEST
+    assert status == HTTPStatus.ALREADY_REPORTED
 
 
 def test_register_creates_user_when_username_does_not_exist(dummy_db, mocker):
