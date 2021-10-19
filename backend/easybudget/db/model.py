@@ -11,6 +11,9 @@ class User(MongoModel):
     class Meta:
         cascade = True
 
+    def serialize(self):
+        return {'username': self.username, 'password': self.password_sha2}
+
 
 class Transaction(MongoModel):
     owner = fields.EmbeddedDocumentField(User)

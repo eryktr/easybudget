@@ -8,6 +8,7 @@ itsdangerous==2.0.1
 Jinja2==3.0.2
 MarkupSafe==2.0.1
 mccabe==0.6.1
+mongomock==3.23.0
 mypy==0.910
 mypy-extensions==0.4.3
 packaging==21.0
@@ -17,10 +18,14 @@ pluggy==1.0.0
 py==1.10.0
 pycodestyle==2.8.0
 pyflakes==2.4.0
+pymodm==0.4.3
+pymongo==3.12.0
 pyparsing==2.4.7
 pytest==6.2.5
 pytest-mock==3.6.1
 regex==2021.10.8
+sentinels==1.0.0
+six==1.16.0
 toml==0.10.2
 tomli==1.2.1
 typing-extensions==3.10.0.2
