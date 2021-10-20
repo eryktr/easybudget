@@ -88,5 +88,13 @@ def patch_budget(db_service: DbService, request, jwt_secret: str):
     return budget.serialize()
 
 
+@require_jwt
+def delete_budget(db_service: DbService, request, jwt_secret: str):
+    budget_id = request.json['budget_id']
+    budget = db_service.get_budget(budget_id)
+    budget.delete()
+    return {'id': budget_id}, HTTPStatus.OK
+
+
 def _fetch_token(request) -> str:
     return request.headers.get('Authorization').split()[1]

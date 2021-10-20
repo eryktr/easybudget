@@ -1,4 +1,4 @@
-import { Container, Alert, Card, Button } from "react-bootstrap";
+import { Container, Alert, Card, Button, ListGroup } from "react-bootstrap";
 import { useState, useEffect } from "react";
 import { HOST } from "../const";
 import axios from "axios";
@@ -15,9 +15,11 @@ export default function BudgetsView() {
   const [sharedBudgetsPage, setSharedBudgetsPage] = useState(0);
   const [sharedBudgetsNumPages, setSharedBudgetsNumPages] = useState(0);
 
+  const [deletedBudgetId, setDeletedBudgetId] = useState(0);
+
   useEffect(() => {
     updateBudgets(setYourBudgets, setYourBudgetsNumPages, yourBudgetsPage, 'own');
-  }, [yourBudgetsPage]);
+  }, [yourBudgetsPage, deletedBudgetId]);
 
   useEffect(() => {
       updateBudgets(setSharedBudgets, setSharedBudgetsNumPages, sharedBudgetsPage, 'shared');
@@ -37,6 +39,7 @@ export default function BudgetsView() {
           yourBudgetsPage={yourBudgetsPage}
           yourBudgetsNumPages={yourBudgetsNumPages}
           setYourBudgetsPage={setYourBudgetsPage}
+          setDeletedBudgetId={setDeletedBudgetId}
         ></YourBudgetsOverview>
       )}
 
@@ -59,16 +62,30 @@ export default function BudgetsView() {
 }
 
 function Budget(props) {
-  const { name, amount, transactions, canDelete } = props;
+  const { name, amount, transactions, author, id, canDelete, setDeletedBudgetId } = props;
 
   return (
-    <Card style={{ width: "18rem" }}>
+    <Card style={{ width: "50rem" }}>
       <Card.Body>
-        <Card.Title>Name: {name}</Card.Title>
-        <Card.Title>Amount: {amount}</Card.Title>
-        <Card.Title>Number of transactions: {transactions.length}</Card.Title>
+        <Card.Title><b>Name:</b> {name}</Card.Title>
+        <Card.Title><b>Author:</b> {author}</Card.Title>
+        <Card.Title><b>Amount:</b> {amount}</Card.Title>
+        <Card.Title><b>Number of transactions:</b> {transactions.length}</Card.Title>
+        <Card.Title><b>Transactions</b></Card.Title>
+        <ListGroup>
+            {transactions.map((t, i) => {
+                return (
+                    <ListGroup.Item key={i}>
+                        <b>Owner: </b>: {t.owner}<br/>
+                        <b>Type: </b> {t.type}<br/>
+                        <b>Amount: </b>{t.amount}<br/>
+                        <b>Description: </b> {t.description}
+                    </ListGroup.Item>
+                )
+            })}
+        </ListGroup>
         <Button variant="primary">View</Button>
-        {canDelete && <Button variant="danger">Delete</Button>}
+        {canDelete && <Button variant="danger" onClick={() => deleteBudget(id, setDeletedBudgetId)}>Delete</Button>}
       </Card.Body>
     </Card>
   );
@@ -80,10 +97,11 @@ function YourBudgetsOverview(props) {
     yourBudgetsPage,
     yourBudgetsNumPages,
     setYourBudgetsPage,
+    setDeletedBudgetId,
   } = props;
   return (
     <>
-      {getYourBudgets(yourBudgets)}
+      {getYourBudgets(yourBudgets, setDeletedBudgetId)}
       {getPagingPanel(yourBudgetsPage, yourBudgetsNumPages, setYourBudgetsPage)}
     </>
   );
@@ -124,14 +142,17 @@ function updateBudgets(setBudgets, setNumPages, page, type) {
   });
 }
 
-function getYourBudgets(yourBudgets) {
+function getYourBudgets(yourBudgets, setDeletedBudgetId) {
   return yourBudgets.map((budget, idx) => (
     <Budget
       key={idx}
       name={budget.name}
       amount={budget.amount}
       transactions={budget.transactions}
+      author={budget.author}
+      id={budget.id}
       canDelete={true}
+      setDeletedBudgetId={setDeletedBudgetId}
     />
   ));
 }
@@ -143,6 +164,8 @@ function getSharedBudgets(sharedBudgets) {
           name={budget.name}
           amount={budget.amount}
           transactions={budget.transactions}
+          author={budget.author}
+          id={budget.id}
           canDelete={false}
         />
       ));
@@ -157,4 +180,19 @@ function getPagingPanel(page, numPages, setPage) {
       {page >= 0 && page <= numPages && <Button variant="primary" onClick={() => setPage(page+1)}>Next</Button>}
     </>
   );
+}
+
+function deleteBudget(id, setDeletedBudgetId) {
+     const url = HOST + '/budget';
+     const data = {
+         budget_id: id
+     }
+     const headers = {
+        Authorization: "Bearer " + localStorage.getItem("accessToken"),
+    };
+
+     axios.delete(url, {
+         headers: headers,
+         data: data
+    }).then(res => console.log(res.data.id) || setDeletedBudgetId(res.data.id))
 }
