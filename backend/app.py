@@ -1,7 +1,7 @@
 from flask import Flask, request
 
 from easybudget.db.db import DbService
-import routes
+import easybudget.routes as routes
 
 
 def create_app():
@@ -27,6 +27,10 @@ def create_app():
     @app.route('/budgets', methods=['GET'])
     def get_budgets():
         return routes.get_budgets(db_service, request, jwt_secret)
+
+    @app.route('/budget', methods=['POST'])
+    def create_budget():
+        return routes.create_budget(db_service, request, jwt_secret)
 
     return app
 

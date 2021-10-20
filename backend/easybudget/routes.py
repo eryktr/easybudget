@@ -33,15 +33,31 @@ def login(db_service: DbService, request, jwt_secret):
 def get_users(db_service: DbService) -> dict[str, list]:
     users = list(db_service.users)
 
-    return {'users': [{'username': u.username, 'password': u.password_sha2} for u in users]}
+    return {'users': [u.serialize() for u in users]}
 
 
-def get_budgets(db_service: DbService, request, jwt_secret: str):
-    try:
-        token = request.headers.get('Authorization').split()[1]
-        payload = jwt_provider.decode(token, jwt_secret)
-        return payload['username'], 200
-    except InvalidSignatureError:
-        return {'status': 'INVALID TOKEN SIGNATURE'}, 400
-    except DecodeError:
-        return {'status': 'INVALID TOKEN'}, 400
+def get_budgets(db_service: DbService, request, jwt_secret: str) -> tuple[dict, int]:
+    token = _fetch_token(request)
+    payload = jwt_provider.decode(token, jwt_secret)
+    if payload is None:
+        return {'status': 'Invalid token'}, HTTPStatus.BAD_REQUEST
+    budgets = db_service.budgets_of(payload['username'])
+    return {'budgets': [b.serialize() for b in budgets]}, 200
+
+
+def create_budget(db_service: DbService, request, jwt_secret: str):
+    token = _fetch_token(request)
+    payload = jwt_provider.decode(token, jwt_secret)
+    if payload is None:
+        return {'status': 'Invalid token.'}, HTTPStatus.UNAUTHORIZED
+
+    author = db_service.get_user(payload['username'])
+    amount = request.json['amount']
+    name = request.json['name']
+
+    db_service.add_budget(name, author, amount)
+    return {'status': 'OK'}, 200
+
+
+def _fetch_token(request) -> str:
+    return request.headers.get('Authorization').split()[1]

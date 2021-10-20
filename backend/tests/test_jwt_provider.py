@@ -19,10 +19,10 @@ def test_verification_fails_when_used_invalid_secret():
     username = 'user'
 
     token = jwt_provider.get_jwt(username, secret)
-    with pytest.raises(jwt.exceptions.InvalidSignatureError):
-        jwt_provider.decode(token, bad_secret)
+    payload = jwt_provider.decode(token, bad_secret)
+
+    assert payload is None
 
 
 def test_verification_fails_with_invalid_token():
-    with pytest.raises(jwt.exceptions.DecodeError):
-        jwt_provider.decode('invalidtoken', 'nonsense')
+    assert jwt_provider.decode('invalidtoken', 'nonsense') is None

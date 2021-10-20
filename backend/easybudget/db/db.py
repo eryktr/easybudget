@@ -3,7 +3,7 @@ from typing import Iterator
 from pymodm import connect
 from pymongo import MongoClient
 
-from easybudget.db.model import User
+from easybudget.db.model import User, Budget
 
 
 class DbService:
@@ -16,6 +16,9 @@ class DbService:
     def add_user(self, username: str, pass_sha: str) -> None:
         User(username, pass_sha).save()
 
+    def add_budget(self, name: str, author: str, amount: float) -> None:
+        Budget(name, author, amount).save()
+
     def user_exists(self, username: str) -> bool:
         return User.objects.raw({'username': username}).count() > 0
 
@@ -24,6 +27,12 @@ class DbService:
             'username': username,
             'password_sha2': pass_sha,
         }).count() > 0
+
+    def budgets_of(self, username: str) -> Iterator[Budget]:
+        return Budget.objects.raw({'author.username': username})
+
+    def get_user(self, username: str) -> User:
+        return User.objects.raw({'username': username}).first()
 
     @property
     def users(self) -> Iterator[User]:
