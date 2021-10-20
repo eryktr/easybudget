@@ -1,8 +1,5 @@
 from pymodm import MongoModel, fields
 
-x = 10
-y = 10
-
 
 class User(MongoModel):
     username = fields.CharField(min_length=3, max_length=20)
