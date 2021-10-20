@@ -7,6 +7,7 @@ import easybudget.routes as routes
 
 def create_app():
     app = Flask(__name__)
+    CORS(app)
     jwt_secret = 'shouldBeRandomAndKeptSecretInProduction'
     app.config.from_mapping(
         SECRET_KEY='dev',
@@ -46,5 +47,4 @@ def create_app():
 
 if __name__ == '__main__':
     app = create_app()
-    CORS(app)
     app.run()

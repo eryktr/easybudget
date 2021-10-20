@@ -12,6 +12,7 @@ import { useState, useEffect } from 'react'
 import jwt_decode from 'jwt-decode'
 import { AuthRoute, ProtectedRoute } from '../components/Routes'
 import  Logout  from '../components/Logout'
+import BudgetsView from './BudgetsView';
 import { Container } from 'react-bootstrap'
 
 function App() {
@@ -32,7 +33,18 @@ function App() {
         <ProtectedRoute path="/logout" isAuth={user !== undefined} setUser={setUser} component={Logout}/>
         <Route path="/" exact>
           <Container>
-            {user ? <h1>Nice to see you, {user}</h1> : ''}
+            {
+            user
+            && 
+            <Container>
+              <h1>Nice to see you, {user}</h1>
+              <BudgetsView></BudgetsView>
+            </Container>
+
+             
+          
+      
+            }
           </Container>
         </Route>
       </Switch>
