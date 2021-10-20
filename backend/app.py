@@ -1,4 +1,5 @@
 from flask import Flask, request
+from flask_cors import CORS
 
 from easybudget.db.db import DbService
 import easybudget.routes as routes
@@ -45,4 +46,5 @@ def create_app():
 
 if __name__ == '__main__':
     app = create_app()
+    CORS(app)
     app.run()
