@@ -1,8 +1,9 @@
+from http import HTTPStatus
+
+import easybudget.hashing as hashing
 import easybudget.jwt_provider as jwt_provider
 from easybudget.db.db import DbService
-from http import HTTPStatus
-import easybudget.hashing as hashing
-from jwt.exceptions import InvalidSignatureError, DecodeError
+from itertools import chain
 
 
 def register(db_service: DbService, request) -> tuple[dict, int]:
@@ -42,7 +43,8 @@ def get_budgets(db_service: DbService, request, jwt_secret: str) -> tuple[dict, 
     if payload is None:
         return {'status': 'Invalid token'}, HTTPStatus.BAD_REQUEST
     budgets = db_service.budgets_of(payload['username'])
-    return {'budgets': [b.serialize() for b in budgets]}, 200
+    collaborates = db_service.budgets_shared_with(payload['username'])
+    return {'budgets': [b.serialize() for b in chain(budgets, collaborates)]}, 200
 
 
 def create_budget(db_service: DbService, request, jwt_secret: str):
@@ -55,8 +57,34 @@ def create_budget(db_service: DbService, request, jwt_secret: str):
     amount = request.json['amount']
     name = request.json['name']
 
-    db_service.add_budget(name, author, amount)
-    return {'status': 'OK'}, 200
+    budget = db_service.add_budget(name, author, amount)
+    return budget.serialize(), 200
+
+
+def get_budget(db_service: DbService, request, jwt_secret: str):
+    token = _fetch_token(request)
+    payload = jwt_provider.decode(token, jwt_secret)
+    if payload is None:
+        return {'status': 'Invalid token.'}, HTTPStatus.UNAUTHORIZED
+
+
+def patch_budget(db_service: DbService, request, jwt_secret: str):
+    token = _fetch_token(request)
+    payload = jwt_provider.decode(token, jwt_secret)
+    if payload is None:
+        return {'status': 'Invalid token.'}, HTTPStatus.UNAUTHORIZED
+
+    budget_id = request.json['budget_id']
+    budget = db_service.get_budget(budget_id)
+    contributors_nicknames = request.json.get('contributors')
+
+    contributors = [db_service.get_user(nick) for nick in contributors_nicknames]
+
+    if contributors:
+        budget.contributors = contributors
+
+    budget.save()
+    return budget.serialize()
 
 
 def _fetch_token(request) -> str:

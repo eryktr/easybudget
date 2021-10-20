@@ -32,6 +32,14 @@ def create_app():
     def create_budget():
         return routes.create_budget(db_service, request, jwt_secret)
 
+    @app.route('/budget', methods=['PATCH'])
+    def patch_budget():
+        return routes.patch_budget(db_service, request, jwt_secret)
+
+    @app.route('/budget/<name>', methods=['GET'])
+    def get_budget():
+        return routes.get_budget(db_service, request, jwt_secret)
+
     return app
 
 

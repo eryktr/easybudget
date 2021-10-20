@@ -4,7 +4,7 @@ from pymodm import connect
 from pymongo import MongoClient
 
 from easybudget.db.model import User, Budget
-
+from bson.objectid import ObjectId
 
 class DbService:
     _client: MongoClient
@@ -16,8 +16,8 @@ class DbService:
     def add_user(self, username: str, pass_sha: str) -> None:
         User(username, pass_sha).save()
 
-    def add_budget(self, name: str, author: str, amount: float) -> None:
-        Budget(name, author, amount).save()
+    def add_budget(self, name: str, author: str, amount: float) -> Budget:
+        return Budget(name, author, amount).save()
 
     def user_exists(self, username: str) -> bool:
         return User.objects.raw({'username': username}).count() > 0
@@ -31,8 +31,14 @@ class DbService:
     def budgets_of(self, username: str) -> Iterator[Budget]:
         return Budget.objects.raw({'author.username': username})
 
+    def budgets_shared_with(self, username: str) -> Iterator[Budget]:
+        return Budget.objects.raw({'contributors': {'$elemMatch': {'username': username}}})
+
     def get_user(self, username: str) -> User:
         return User.objects.raw({'username': username}).first()
+
+    def get_budget(self, budget_id: str) -> Budget:
+        return Budget.objects.raw({'_id': ObjectId(budget_id)}).first()
 
     @property
     def users(self) -> Iterator[User]:
