@@ -6,6 +6,7 @@ from pymongo import MongoClient
 from easybudget.db.model import User, Budget
 from bson.objectid import ObjectId
 
+
 class DbService:
     _client: MongoClient
 
@@ -16,8 +17,10 @@ class DbService:
     def add_user(self, username: str, pass_sha: str) -> None:
         User(username, pass_sha).save()
 
-    def add_budget(self, name: str, author: str, amount: float) -> Budget:
-        return Budget(name, author, amount).save()
+    def add_budget(self, name: str, author: str, amount: float, contributors=None) -> Budget:
+        if not contributors:
+            return Budget(name, author, amount).save()
+        return Budget(name, author, amount, contributors=contributors).save()
 
     def user_exists(self, username: str) -> bool:
         return User.objects.raw({'username': username}).count() > 0

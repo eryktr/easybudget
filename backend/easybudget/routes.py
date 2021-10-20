@@ -68,8 +68,12 @@ def create_budget(db_service: DbService, request, jwt_secret: str):
     author = db_service.get_user(request.jwt_payload['username'])
     amount = request.json['amount']
     name = request.json['name']
+    contributor_usernames = request.json['contributors']
 
-    budget = db_service.add_budget(name, author, amount)
+    contributors = [db_service.get_user(username) for username in contributor_usernames] \
+        if contributor_usernames else []
+
+    budget = db_service.add_budget(name, author, amount, contributors=contributors)
     return budget.serialize(), 200
 
 

@@ -19,11 +19,11 @@ export default function BudgetsView() {
 
   useEffect(() => {
     updateBudgets(setYourBudgets, setYourBudgetsNumPages, yourBudgetsPage, 'own');
-  }, [yourBudgetsPage, deletedBudgetId]);
+  }, [yourBudgetsPage, deletedBudgetId, yourBudgetsVisible]);
 
   useEffect(() => {
       updateBudgets(setSharedBudgets, setSharedBudgetsNumPages, sharedBudgetsPage, 'shared');
-  }, [sharedBudgetsPage])
+  }, [sharedBudgetsPage, sharedBudgetsVisible]);
 
   return (
     <Container>
@@ -62,8 +62,8 @@ export default function BudgetsView() {
 }
 
 function Budget(props) {
-  const { name, amount, transactions, author, id, canDelete, setDeletedBudgetId } = props;
-
+  const { budgetData, canDelete, setDeletedBudgetId } = props;
+  const { id, name, author, amount, transactions, contributors } = budgetData;
   return (
     <Card style={{ width: "50rem" }}>
       <Card.Body>
@@ -71,6 +71,7 @@ function Budget(props) {
         <Card.Title><b>Author:</b> {author}</Card.Title>
         <Card.Title><b>Amount:</b> {amount}</Card.Title>
         <Card.Title><b>Number of transactions:</b> {transactions.length}</Card.Title>
+        <Card.Title><b>Contributors:</b> {contributors}</Card.Title>
         <Card.Title><b>Transactions</b></Card.Title>
         <ListGroup>
             {transactions.map((t, i) => {
@@ -146,11 +147,7 @@ function getYourBudgets(yourBudgets, setDeletedBudgetId) {
   return yourBudgets.map((budget, idx) => (
     <Budget
       key={idx}
-      name={budget.name}
-      amount={budget.amount}
-      transactions={budget.transactions}
-      author={budget.author}
-      id={budget.id}
+      budgetData={budget}
       canDelete={true}
       setDeletedBudgetId={setDeletedBudgetId}
     />
@@ -161,11 +158,7 @@ function getSharedBudgets(sharedBudgets) {
     return sharedBudgets.map((budget, idx) => (
         <Budget
           key={idx}
-          name={budget.name}
-          amount={budget.amount}
-          transactions={budget.transactions}
-          author={budget.author}
-          id={budget.id}
+          budgetData={budget}
           canDelete={false}
         />
       ));
@@ -177,7 +170,7 @@ function getPagingPanel(page, numPages, setPage) {
     <>
       Page: {page + 1}/{numPages}
       {page > 0 && <Button variant="primary" onClick={() => setPage(page-1)}>Prev</Button>}
-      {page >= 0 && page <= numPages && <Button variant="primary" onClick={() => setPage(page+1)}>Next</Button>}
+      {page >= 0 && page + 1 < numPages && <Button variant="primary" onClick={() => setPage(page+1)}>Next</Button>}
     </>
   );
 }

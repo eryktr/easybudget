@@ -12,6 +12,7 @@ import { useState, useEffect } from 'react'
 import jwt_decode from 'jwt-decode'
 import { AuthRoute, ProtectedRoute } from '../components/Routes'
 import  Logout  from '../components/Logout'
+import CreateBudget from '../components/CretaeBudget'
 import BudgetsView from './BudgetsView';
 import { Container } from 'react-bootstrap'
 
@@ -38,7 +39,8 @@ function App() {
             && 
             <Container>
               <h1>Nice to see you, {user}</h1>
-              <BudgetsView></BudgetsView>
+              <CreateBudget user={user}/>
+              <BudgetsView/>
             </Container>
 
              
