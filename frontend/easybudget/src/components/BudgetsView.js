@@ -38,17 +38,26 @@ export default function BudgetsView() {
 
   const [deletedBudgetId, setDeletedBudgetId] = useState(0);
 
-  const [trigger, forceRerender] = useReducer(x => x+1, 0);
+  const [trigger, forceRerender] = useReducer((x) => x + 1, 0);
+
 
   useEffect(() => {
-    updateBudgets(setYourBudgets, setYourBudgetsNumPages, yourBudgetsPage, 'own');
+    updateBudgets(
+      setYourBudgets,
+      setYourBudgetsNumPages,
+      yourBudgetsPage,
+      "own"
+    );
   }, [yourBudgetsPage, deletedBudgetId, yourBudgetsVisible, trigger]);
 
   useEffect(() => {
-      updateBudgets(setSharedBudgets, setSharedBudgetsNumPages, sharedBudgetsPage, 'shared');
+    updateBudgets(
+      setSharedBudgets,
+      setSharedBudgetsNumPages,
+      sharedBudgetsPage,
+      "shared"
+    );
   }, [sharedBudgetsPage, sharedBudgetsVisible, trigger]);
-
-
 
   return (
     <Container>
@@ -66,7 +75,7 @@ export default function BudgetsView() {
             yourBudgetsNumPages={yourBudgetsNumPages}
             setYourBudgetsPage={setYourBudgetsPage}
             setDeletedBudgetId={setDeletedBudgetId}
-          ></YourBudgetsOverview>
+          />
         )}
 
         <Alert
@@ -81,13 +90,12 @@ export default function BudgetsView() {
             sharedBudgetsPage={sharedBudgetsPage}
             sharedBudgetsNumPages={sharedBudgetsNumPages}
             sharedYourBudgetsPage={setSharedBudgetsPage}
-          ></SharedBudgetsOverview>
-      )}
+          />
+        )}
       </BudgetsContextProvider>
     </Container>
   );
 }
-
 
 function YourBudgetsOverview(props) {
   const {
@@ -106,19 +114,23 @@ function YourBudgetsOverview(props) {
 }
 
 function SharedBudgetsOverview(props) {
-    const {
-        sharedBudgets,
-        sharedBudgetsPage,
-        sharedBudgetsNumPages,
-        setSharedBudgetsPage,
-    } = props;
+  const {
+    sharedBudgets,
+    sharedBudgetsPage,
+    sharedBudgetsNumPages,
+    setSharedBudgetsPage,
+  } = props;
 
-    return (
+  return (
     <>
       {getSharedBudgets(sharedBudgets)}
-      {getPagingPanel(sharedBudgetsPage, sharedBudgetsNumPages, setSharedBudgetsPage)}
+      {getPagingPanel(
+        sharedBudgetsPage,
+        sharedBudgetsNumPages,
+        setSharedBudgetsPage
+      )}
     </>
-    )
+  );
 }
 
 function getYourBudgets(yourBudgets, setDeletedBudgetId) {
@@ -133,22 +145,25 @@ function getYourBudgets(yourBudgets, setDeletedBudgetId) {
 }
 
 function getSharedBudgets(sharedBudgets) {
-    return sharedBudgets.map((budget, idx) => (
-        <Budget
-          key={idx}
-          budgetData={budget}
-          canDelete={false}
-        />
-      ));
+  return sharedBudgets.map((budget, idx) => (
+    <Budget key={idx} budgetData={budget} canDelete={false} />
+  ));
 }
-
 
 function getPagingPanel(page, numPages, setPage) {
   return (
     <>
       Page: {page + 1}/{numPages}
-      {page > 0 && <Button variant="primary" onClick={() => setPage(page-1)}>Prev</Button>}
-      {page >= 0 && page + 1 < numPages && <Button variant="primary" onClick={() => setPage(page+1)}>Next</Button>}
+      {page > 0 && (
+        <Button variant="primary" onClick={() => setPage(page - 1)}>
+          Prev
+        </Button>
+      )}
+      {page >= 0 && page + 1 < numPages && (
+        <Button variant="primary" onClick={() => setPage(page + 1)}>
+          Next
+        </Button>
+      )}
     </>
   );
 }

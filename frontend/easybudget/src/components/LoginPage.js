@@ -24,12 +24,12 @@ export default function LoginPage(props) {
             }
             <Form.Group controlId="formUsername">
                 <Form.Label>Username</Form.Label>
-                <Form.Control type="text" placeholder="username" id="usernameField"></Form.Control>
+                <Form.Control type="text" placeholder="username" id="usernameField"/>
             </Form.Group>
 
             <Form.Group controlId="formPassword">
                 <Form.Label>Password</Form.Label>
-                <Form.Control type="password" placeholder="password" id="passwordField"></Form.Control>
+                <Form.Control type="password" placeholder="password" id="passwordField"/>
             </Form.Group>
 
             <Button variant="primary" type="submit" onClick={

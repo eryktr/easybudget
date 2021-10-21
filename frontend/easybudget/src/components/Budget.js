@@ -34,12 +34,13 @@ export default function Budget(props) {
           {canDelete && <Button variant="danger" onClick={() => deleteBudget(id, setDeletedBudgetId)}>Delete</Button>}
           <Button variant="warning" onClick={() => setAddTransactionVisible(!addTransactionVisible)}>Add transaction</Button>
           {addTransactionVisible && <CreateTransactionForm budgetId={id}/>}
+          <Card.Title><b>Total: </b>{calculateTotal(transactions)} / {amount}</Card.Title>
         </Card.Body>
       </Card>
     );
   }
 
-  function deleteBudget(id, setDeletedBudgetId) {
+function deleteBudget(id, setDeletedBudgetId) {
     const url = HOST + '/budget';
     const data = {
         budget_id: id
@@ -52,4 +53,16 @@ export default function Budget(props) {
         headers: headers,
         data: data
    }).then(res => console.log(res.data.id) || setDeletedBudgetId(res.data.id))
+}
+
+function calculateTotal(transactions) {
+    let total = 0;
+    for (let t of transactions) {
+        if (t.type === "INCOME") {
+            total  -= t.amount;
+        } else {
+            total += t.amount;
+        }
+    }
+    return total;
 }
