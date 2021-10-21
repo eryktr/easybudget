@@ -33,7 +33,11 @@ class Budget(MongoModel):
     name = fields.CharField()
     author = fields.EmbeddedDocumentField(User)
     amount = fields.FloatField(min_value=0)
-    contributors = fields.EmbeddedDocumentListField(User, default=list, blank=True)
+    contributors = fields.EmbeddedDocumentListField(
+        User,
+        default=list,
+        blank=True
+    )
     transactions = fields.EmbeddedDocumentListField(
         Transaction, default=list, blank=True
     )

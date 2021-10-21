@@ -1,6 +1,4 @@
 import easybudget.jwt_provider as jwt_provider
-import jwt
-import pytest
 
 
 def test_properly_decodes_jwt_produced_with_same_secret():

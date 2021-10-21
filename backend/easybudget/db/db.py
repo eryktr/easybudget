@@ -53,7 +53,12 @@ class DbService:
         return Budget.objects.raw({"_id": ObjectId(budget_id)}).first()
 
     def add_transaction(
-        self, owner: User, budget: Budget, type_: str, description: str, amount: float
+        self,
+        owner: User,
+        budget: Budget,
+        type_: str,
+        description: str,
+        amount: float
     ) -> Transaction:
         transaction = Transaction(owner, type_, amount, description)
         transaction.save()
