@@ -8,17 +8,18 @@ import {
 import LoginPage from './LoginPage';
 import RegisterPage from './RegisterPage';
 import TopBar from './TopBar';
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import jwt_decode from 'jwt-decode'
 import { AuthRoute, ProtectedRoute } from '../components/Routes'
 import  Logout  from '../components/Logout'
 import CreateBudget from '../components/CretaeBudget'
 import BudgetsView from './BudgetsView';
 import { Container } from 'react-bootstrap'
+import { UserContextProvider } from '../contexts/UserContext';
 
 function App() {
   const [user, setUser] = useState();
-  
+
   useEffect(() => {
     const jwt = localStorage.getItem('accessToken');
     if (!jwt) return;
@@ -38,14 +39,11 @@ function App() {
             user
             && 
             <Container>
-              <h1>Nice to see you, {user}</h1>
               <CreateBudget user={user}/>
-              <BudgetsView/>
+              <UserContextProvider value={user}>
+                <BudgetsView user={user}/>
+              </UserContextProvider>
             </Container>
-
-             
-          
-      
             }
           </Container>
         </Route>

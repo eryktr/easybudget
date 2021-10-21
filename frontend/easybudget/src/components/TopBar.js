@@ -1,14 +1,17 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { Navbar, Nav } from 'react-bootstrap'
+import { Navbar, Nav, Container } from 'react-bootstrap'
 
 export default function TopBar(props) {
     return (
         <Navbar bg="dark" variant="dark">
-            <Navbar.Brand href="/">EasyBudget</Navbar.Brand>
-            <Nav className="mr-auto">
-            {getLinks(props)}
-            </Nav>
+            <Container>
+              <Navbar.Brand href="/">EasyBudget</Navbar.Brand>
+              <Navbar.Text>Logged in as {props.user}</Navbar.Text>
+              <Nav className="mr-auto">
+              {getLinks(props)}
+              </Nav>
+            </Container>
         </Navbar>
     )
 }

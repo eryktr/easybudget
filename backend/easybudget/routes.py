@@ -100,5 +100,19 @@ def delete_budget(db_service: DbService, request, jwt_secret: str):
     return {'id': budget_id}, HTTPStatus.OK
 
 
+@require_jwt
+def add_transaction(db_service: DbService, request, jwt_secret: str):
+    owner = db_service.get_user(request.jwt_payload['username'])
+    budget_id = request.json['budget_id']
+    budget = db_service.get_budget(budget_id)
+    type_ = request.json['type']
+    description = request.json['description']
+    amount = request.json['amount']
+
+    transaction = db_service.add_transaction(owner, budget, type_, description, amount)
+
+    return transaction.serialize(), HTTPStatus.OK
+
+
 def _fetch_token(request) -> str:
     return request.headers.get('Authorization').split()[1]

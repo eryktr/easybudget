@@ -15,10 +15,14 @@ export default function CreateBudget(user) {
 }
 
 function BudgetForm(user) {
+    const [ok, setOk] = useState(false)
+    const [error, setError] = useState(false)
+
     return (
         <Form id="createBudgetForm">
             <h1>Create Budget</h1>
-            
+            {ok && <Alert variant="success">Budget successfully created</Alert>}
+            {error && <Alert variant="danger">Something went wrong</Alert>}
             <Form.Group>
                 <Form.Label>Name</Form.Label>
                 <Form.Control type="text" placeholder="Budget name" id="nameField"></Form.Control>
@@ -37,14 +41,14 @@ function BudgetForm(user) {
                 </Form.Text>
             </Form.Group>
 
-            <Button variant="primary" type="submit" onClick={e => createBudget(e, user)}>
+            <Button variant="primary" type="submit" onClick={e => createBudget(e, user, setOk, setError)}>
                 Create Budget
             </Button>
         </Form>
     )
 }
 
-function createBudget(e, user) {
+function createBudget(e, user, setOk, setError) {
     e.preventDefault();
     const name = document.getElementById("nameField").value;
     const amount = document.getElementById("amountField").value;
@@ -73,5 +77,17 @@ function createBudget(e, user) {
 
     axios.post(url, data, {
         headers: headers,
-    }).then(res => console.log(res))
+    }).then(res => {
+        if (res.data.id) {
+            setOk(true);
+            setError(false);
+        } else {
+            setError(true);
+            setOk(false);
+        }
+    })
+    .catch(err => {
+        setError(true);
+        setOk(false);
+    })
 }

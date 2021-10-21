@@ -1,7 +1,28 @@
 import { Container, Alert, Card, Button, ListGroup } from "react-bootstrap";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { HOST } from "../const";
 import axios from "axios";
+import { UserContext } from "../contexts/UserContext";
+import Budget from "./Budget";
+
+function updateBudgets(setBudgets, setNumPages, page, type) {
+  const url = HOST + "/budgets";
+  const reqConfig = {
+    params: {
+      type: type,
+      page: page,
+    },
+    headers: {
+      Authorization: "Bearer " + localStorage.getItem("accessToken"),
+    },
+  };
+  axios.get(url, reqConfig).then((res) => {
+    const budgets = res.data.budgets;
+    const numPages = res.data.num_pages;
+    setBudgets(budgets);
+    setNumPages(numPages);
+  });
+}
 
 export default function BudgetsView() {
   const [yourBudgetsVisible, setYourBudgetsVisible] = useState(false);
@@ -61,36 +82,6 @@ export default function BudgetsView() {
   );
 }
 
-function Budget(props) {
-  const { budgetData, canDelete, setDeletedBudgetId } = props;
-  const { id, name, author, amount, transactions, contributors } = budgetData;
-  return (
-    <Card style={{ width: "50rem" }}>
-      <Card.Body>
-        <Card.Title><b>Name:</b> {name}</Card.Title>
-        <Card.Title><b>Author:</b> {author}</Card.Title>
-        <Card.Title><b>Amount:</b> {amount}</Card.Title>
-        <Card.Title><b>Number of transactions:</b> {transactions.length}</Card.Title>
-        <Card.Title><b>Contributors:</b> {contributors}</Card.Title>
-        <Card.Title><b>Transactions</b></Card.Title>
-        <ListGroup>
-            {transactions.map((t, i) => {
-                return (
-                    <ListGroup.Item key={i}>
-                        <b>Owner: </b>: {t.owner}<br/>
-                        <b>Type: </b> {t.type}<br/>
-                        <b>Amount: </b>{t.amount}<br/>
-                        <b>Description: </b> {t.description}
-                    </ListGroup.Item>
-                )
-            })}
-        </ListGroup>
-        <Button variant="primary">View</Button>
-        {canDelete && <Button variant="danger" onClick={() => deleteBudget(id, setDeletedBudgetId)}>Delete</Button>}
-      </Card.Body>
-    </Card>
-  );
-}
 
 function YourBudgetsOverview(props) {
   const {
@@ -124,25 +115,6 @@ function SharedBudgetsOverview(props) {
     )
 }
 
-function updateBudgets(setBudgets, setNumPages, page, type) {
-  const url = HOST + "/budgets";
-  const reqConfig = {
-    params: {
-      type: type,
-      page: page,
-    },
-    headers: {
-      Authorization: "Bearer " + localStorage.getItem("accessToken"),
-    },
-  };
-  axios.get(url, reqConfig).then((res) => {
-    const budgets = res.data.budgets;
-    const numPages = res.data.num_pages;
-    setBudgets(budgets);
-    setNumPages(numPages);
-  });
-}
-
 function getYourBudgets(yourBudgets, setDeletedBudgetId) {
   return yourBudgets.map((budget, idx) => (
     <Budget
@@ -173,19 +145,4 @@ function getPagingPanel(page, numPages, setPage) {
       {page >= 0 && page + 1 < numPages && <Button variant="primary" onClick={() => setPage(page+1)}>Next</Button>}
     </>
   );
-}
-
-function deleteBudget(id, setDeletedBudgetId) {
-     const url = HOST + '/budget';
-     const data = {
-         budget_id: id
-     }
-     const headers = {
-        Authorization: "Bearer " + localStorage.getItem("accessToken"),
-    };
-
-     axios.delete(url, {
-         headers: headers,
-         data: data
-    }).then(res => console.log(res.data.id) || setDeletedBudgetId(res.data.id))
 }

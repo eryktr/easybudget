@@ -3,7 +3,7 @@ from typing import Iterator
 from pymodm import connect
 from pymongo import MongoClient
 
-from easybudget.db.model import User, Budget
+from easybudget.db.model import User, Budget, Transaction
 from bson.objectid import ObjectId
 
 
@@ -42,6 +42,13 @@ class DbService:
 
     def get_budget(self, budget_id: str) -> Budget:
         return Budget.objects.raw({'_id': ObjectId(budget_id)}).first()
+
+    def add_transaction(self, owner: User, budget: Budget, type_: str, description: str, amount: float) -> Transaction:
+        transaction = Transaction(owner, type_, amount, description)
+        transaction.save()
+        budget.transactions.append(transaction)
+        budget.save()
+        return transaction
 
     @property
     def users(self) -> Iterator[User]:

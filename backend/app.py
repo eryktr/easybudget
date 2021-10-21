@@ -44,6 +44,10 @@ def create_app():
     def get_budget():
         return routes.get_budget(db_service, request, jwt_secret)
 
+    @app.route('/transaction', methods=['POST'])
+    def add_transaction():
+        return routes.add_transaction(db_service, request, jwt_secret)
+
     return app
 
 
