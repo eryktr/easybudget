@@ -10,7 +10,7 @@ export default function Budget(props) {
     console.log(id);
     const [addTransactionVisible, setAddTransactionVisible] = useState(false);
     return (
-      <Card style={{ width: "50rem" }}>
+      <Card style={{ width: "50rem" }} className="mb-3" border="primary">
         <Card.Body>
           <Card.Title><b>Name:</b> {name}</Card.Title>
           <Card.Title><b>Author:</b> {author}</Card.Title>

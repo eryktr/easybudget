@@ -15,8 +15,16 @@ export default function CreateBudget(user) {
 }
 
 function BudgetForm(user) {
-    const [ok, setOk] = useState(false)
-    const [error, setError] = useState(false)
+    const defaultName = "Budget name";
+    const defaultAmount = "100";
+    const defaultContributors = "";
+
+    const [name, setName] = useState(defaultName);
+    const [amount, setAmount] = useState(defaultAmount);
+    const [contributors, setContributors] = useState(defaultContributors);
+
+    const [ok, setOk] = useState(false);
+    const [error, setError] = useState(false);
 
     return (
         <Form id="createBudgetForm">
@@ -25,34 +33,31 @@ function BudgetForm(user) {
             {error && <Alert variant="danger">Something went wrong</Alert>}
             <Form.Group>
                 <Form.Label>Name</Form.Label>
-                <Form.Control type="text" placeholder="Budget name" id="nameField"></Form.Control>
+                <Form.Control type="text" placeholder="Budget name" onChange={e => setName(e.target.value)}></Form.Control>
             </Form.Group>
 
             <Form.Group>
                 <Form.Label>Amount</Form.Label>
-                <Form.Control type="number" placeholder="100" id="amountField"></Form.Control>
+                <Form.Control type="number" placeholder="100" onChange={e => setAmount(e.target.value)}></Form.Control>
             </Form.Group>
 
             <Form.Group>
                 <Form.Label>Contributors</Form.Label>
-                <Form.Control type="text" placeholder="" id="contributorsField"></Form.Control>
+                <Form.Control type="text" placeholder="" onChange={e=> setContributors(e.target.value)}></Form.Control>
                 <Form.Text className="text-muted">
                     Comma separated list of usernames.
                 </Form.Text>
             </Form.Group>
 
-            <Button variant="primary" type="submit" onClick={e => createBudget(e, user, setOk, setError)}>
+            <Button variant="primary" type="submit" onClick={e => createBudget(e, user, name, amount, contributors, setOk, setError)}>
                 Create Budget
             </Button>
         </Form>
     )
 }
 
-function createBudget(e, user, setOk, setError) {
+function createBudget(e, user, name, amount, contributors, setOk, setError) {
     e.preventDefault();
-    const name = document.getElementById("nameField").value;
-    const amount = document.getElementById("amountField").value;
-    const contributors = document.getElementById("contributorsField").value;
     const author = user;
 
     const url = HOST + '/budget'
@@ -72,8 +77,6 @@ function createBudget(e, user, setOk, setError) {
     const headers = {
         Authorization: "Bearer " + localStorage.getItem("accessToken"),
     }
-
-    console.log(data)
 
     axios.post(url, data, {
         headers: headers,

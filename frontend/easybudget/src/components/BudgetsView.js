@@ -1,9 +1,9 @@
-import { Container, Alert, Card, Button, ListGroup } from "react-bootstrap";
-import { useState, useEffect, useContext } from "react";
+import { Container, Alert, Button } from "react-bootstrap";
+import { useState, useEffect, useReducer } from "react";
 import { HOST } from "../const";
 import axios from "axios";
-import { UserContext } from "../contexts/UserContext";
 import Budget from "./Budget";
+import { BudgetsContextProvider } from "../contexts/BudgetsContext";
 
 function updateBudgets(setBudgets, setNumPages, page, type) {
   const url = HOST + "/budgets";
@@ -38,13 +38,17 @@ export default function BudgetsView() {
 
   const [deletedBudgetId, setDeletedBudgetId] = useState(0);
 
+  const [trigger, forceRerender] = useReducer(x => x+1, 0);
+
   useEffect(() => {
     updateBudgets(setYourBudgets, setYourBudgetsNumPages, yourBudgetsPage, 'own');
-  }, [yourBudgetsPage, deletedBudgetId, yourBudgetsVisible]);
+  }, [yourBudgetsPage, deletedBudgetId, yourBudgetsVisible, trigger]);
 
   useEffect(() => {
       updateBudgets(setSharedBudgets, setSharedBudgetsNumPages, sharedBudgetsPage, 'shared');
-  }, [sharedBudgetsPage, sharedBudgetsVisible]);
+  }, [sharedBudgetsPage, sharedBudgetsVisible, trigger]);
+
+
 
   return (
     <Container>
@@ -54,30 +58,32 @@ export default function BudgetsView() {
       >
         Your budgets
       </Alert>
-      {yourBudgetsVisible && (
-        <YourBudgetsOverview
-          yourBudgets={yourBudgets}
-          yourBudgetsPage={yourBudgetsPage}
-          yourBudgetsNumPages={yourBudgetsNumPages}
-          setYourBudgetsPage={setYourBudgetsPage}
-          setDeletedBudgetId={setDeletedBudgetId}
-        ></YourBudgetsOverview>
-      )}
+      <BudgetsContextProvider value={forceRerender}>
+        {yourBudgetsVisible && (
+          <YourBudgetsOverview
+            yourBudgets={yourBudgets}
+            yourBudgetsPage={yourBudgetsPage}
+            yourBudgetsNumPages={yourBudgetsNumPages}
+            setYourBudgetsPage={setYourBudgetsPage}
+            setDeletedBudgetId={setDeletedBudgetId}
+          ></YourBudgetsOverview>
+        )}
 
-      <Alert
-        variant="secondary"
-        onClick={(e) => setSharedBudgetsVisible(!sharedBudgetsVisible)}
-      >
-        Budgets shared with you
-      </Alert>
-      {sharedBudgetsVisible && (
-        <SharedBudgetsOverview
-          sharedBudgets={sharedBudgets}
-          sharedBudgetsPage={sharedBudgetsPage}
-          sharedBudgetsNumPages={sharedBudgetsNumPages}
-          sharedYourBudgetsPage={setSharedBudgetsPage}
-        ></SharedBudgetsOverview>
+        <Alert
+          variant="secondary"
+          onClick={(e) => setSharedBudgetsVisible(!sharedBudgetsVisible)}
+        >
+          Budgets shared with you
+        </Alert>
+        {sharedBudgetsVisible && (
+          <SharedBudgetsOverview
+            sharedBudgets={sharedBudgets}
+            sharedBudgetsPage={sharedBudgetsPage}
+            sharedBudgetsNumPages={sharedBudgetsNumPages}
+            sharedYourBudgetsPage={setSharedBudgetsPage}
+          ></SharedBudgetsOverview>
       )}
+      </BudgetsContextProvider>
     </Container>
   );
 }
