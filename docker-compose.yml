@@ -1,14 +1,22 @@
 version: '3.7'
 
 services:
-    mongo:
-        image: mongo
-        restart: always
-        environment:
-            MONGO_INITDB_ROOT_USERNAME: root
-            MONGO_INITDB_ROOT_PASSWORD: example
-            MONGO_INITDB_DATABASE: admin
-        ports:
-            - 27017:27017
-        volumes:
-            - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_DATABASE: admin
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+  backend:
+    build: backend
+    ports:
+      - "5000:5000"
+  frontend:
+    build: frontend/easybudget
+    ports:
+      - "3000:3000"

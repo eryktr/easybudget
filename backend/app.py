@@ -12,7 +12,8 @@ def create_app():
     app.config.from_mapping(
         SECRET_KEY='dev',
     )
-    db_service = DbService('root', 'example', '127.0.0.1', 'admin')
+    DB_HOST = 'mongo'
+    db_service = DbService('root', 'example', DB_HOST, 'admin')
 
     @app.route('/register', methods=['POST'])
     def register():
