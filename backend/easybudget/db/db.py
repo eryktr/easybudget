@@ -17,33 +17,44 @@ class DbService:
     def add_user(self, username: str, pass_sha: str) -> None:
         User(username, pass_sha).save()
 
-    def add_budget(self, name: str, author: str, amount: float, contributors=None) -> Budget:
+    def add_budget(
+        self, name: str, author: str, amount: float, contributors=None
+    ) -> Budget:
         if not contributors:
             return Budget(name, author, amount).save()
         return Budget(name, author, amount, contributors=contributors).save()
 
     def user_exists(self, username: str) -> bool:
-        return User.objects.raw({'username': username}).count() > 0
+        return User.objects.raw({"username": username}).count() > 0
 
     def credentials_ok(self, username: str, pass_sha: str) -> bool:
-        return User.objects.raw({
-            'username': username,
-            'password_sha2': pass_sha,
-        }).count() > 0
+        return (
+            User.objects.raw(
+                {
+                    "username": username,
+                    "password_sha2": pass_sha,
+                }
+            ).count()
+            > 0
+        )
 
     def budgets_of(self, username: str) -> Iterator[Budget]:
-        return Budget.objects.raw({'author.username': username})
+        return Budget.objects.raw({"author.username": username})
 
     def budgets_shared_with(self, username: str) -> Iterator[Budget]:
-        return Budget.objects.raw({'contributors': {'$elemMatch': {'username': username}}})
+        return Budget.objects.raw(
+            {"contributors": {"$elemMatch": {"username": username}}}
+        )
 
     def get_user(self, username: str) -> User:
-        return User.objects.raw({'username': username}).first()
+        return User.objects.raw({"username": username}).first()
 
     def get_budget(self, budget_id: str) -> Budget:
-        return Budget.objects.raw({'_id': ObjectId(budget_id)}).first()
+        return Budget.objects.raw({"_id": ObjectId(budget_id)}).first()
 
-    def add_transaction(self, owner: User, budget: Budget, type_: str, description: str, amount: float) -> Transaction:
+    def add_transaction(
+        self, owner: User, budget: Budget, type_: str, description: str, amount: float
+    ) -> Transaction:
         transaction = Transaction(owner, type_, amount, description)
         transaction.save()
         budget.transactions.append(transaction)
@@ -56,4 +67,4 @@ class DbService:
 
 
 def _build_uri(user: str, password: str, host: str, db: str) -> str:
-    return f'mongodb://{user}:{password}@{host}/{db}'
+    return f"mongodb://{user}:{password}@{host}/{db}"
